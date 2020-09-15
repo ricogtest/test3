@@ -1,28 +1,32 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div>
+    <amplify-authenticator v-if="authState !== 'signedin'"></amplify-authenticator>
+    <div v-if="authState === 'signedin' && user">
+      <amplify-sign-out></amplify-sign-out>
+      <div>Hello, {{user.username}}</div>
+    </div>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import { onAuthUIStateChange } from '@aws-amplify/ui-components'
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
+  name: 'AuthStateApp',
+  created() {
+    onAuthUIStateChange((authState, authData) => {
+      this.authState = authState;
+      this.user = authData;
+    })
+  },
+  data() {
+    return {
+      user: undefined,
+      authState: undefined
+    }
+  },
+  beforeDestroy() {
+    return onAuthUIStateChange;
   }
 }
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
